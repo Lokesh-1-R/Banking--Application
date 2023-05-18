@@ -52,20 +52,19 @@ public class AuthenticationService {
         .password(passwordEncoder.encode(request.getPassword()))
         .role(request.getRole())
         .build();
-	
-	  {  
+	  	if(email.isPresent()){
+	  		
+	  	}
+	  	else
+	  	{
 		    var savedUser = repository.save(user);
-	  }
-
+	  	}
     Account account;
-    int id;
-    id =user.getId();
-
+    
     if(!(request.getRole() == Role.ADMIN || request.getRole() == Role.MANAGER))
     {
-         id =user.getId();
 
-    		 account = accountService.DefaultcreateAccount(id);
+    		 account = accountService.DefaultcreateAccount();
     }
     var jwtToken = jwtService.generateToken(user);
     return AuthenticationResponse.builder()

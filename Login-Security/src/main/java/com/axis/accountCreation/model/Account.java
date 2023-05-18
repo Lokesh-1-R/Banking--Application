@@ -36,9 +36,9 @@ public class Account {
     private AccountType accountType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
- 
-    private int userId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User userId;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("d/M/yyyy HH:mm:ss");
@@ -49,7 +49,7 @@ public class Account {
 		// TODO Auto-generated constructor stub
 	}
   
-    public Account(int id,int userId, double accountBalance, AccountStatus accountStatus, String accountNumber, AccountType accountType) {
+    public Account(int id,User userId, double accountBalance, AccountStatus accountStatus, String accountNumber, AccountType accountType) {
        this.Id=id;
     	this.accountBalance = accountBalance;
         this.accountStatus = accountStatus;

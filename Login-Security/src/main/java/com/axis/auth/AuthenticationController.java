@@ -2,17 +2,24 @@ package com.axis.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.axis.accountCreation.Exceptions.UserAlreadyExistException;
+import com.axis.accountCreation.accountService.AccountService;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class AuthenticationController {
 
   private final AuthenticationService service;
+  private final AccountService accountService;
 
   @PostMapping("/register")
   public ResponseEntity<AuthenticationResponse> register(
@@ -27,6 +34,19 @@ public class AuthenticationController {
     return ResponseEntity.ok(service.authenticate(request));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
 
+  @PostMapping("/managerregister")
+  public ResponseEntity<AuthenticationResponse> managerRegister(
+      @RequestBody RegisterRequest request
+  ) throws UserAlreadyExistException {
+    return ResponseEntity.ok(accountService.createManager(request));
+}
+  @PostMapping("/employeeregister")
+  public ResponseEntity<AuthenticationResponse> employeeRegister(
+      @RequestBody RegisterRequest request
+  ) throws UserAlreadyExistException {
+    return ResponseEntity.ok(accountService.createEmployee(request));
+}
 
 }

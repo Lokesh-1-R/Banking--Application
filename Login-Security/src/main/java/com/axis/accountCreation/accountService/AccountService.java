@@ -8,16 +8,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.axis.accountCreation.Exceptions.AccountCannotCloseException;
 import com.axis.accountCreation.Exceptions.AccountNotActivatedException;
 import com.axis.accountCreation.Exceptions.AccountNotFoundException;
 import com.axis.accountCreation.Exceptions.ResourceNotFoundException;
+import com.axis.accountCreation.Exceptions.UserAlreadyExistException;
 import com.axis.accountCreation.accountrepository.AccountRepository;
 import com.axis.accountCreation.model.Account;
 import com.axis.accountCreation.model.AccountStatus;
 import com.axis.accountCreation.model.AccountType;
+import com.axis.auth.AuthenticationResponse;
+import com.axis.auth.RegisterRequest;
+import com.axis.config.JwtService;
+import com.axis.user.Role;
 import com.axis.user.User;
 import com.axis.userrepository.UserRepository;
 
@@ -25,10 +31,14 @@ import com.axis.userrepository.UserRepository;
 public class AccountService {
 	private final AccountRepository accountRepository;
 	private final UserRepository userRepo;
+	private PasswordEncoder passwordEncoder;
+	private JwtService jwtService;
     @Autowired
-    public AccountService(AccountRepository accountRepository,UserRepository userRepo) {
+    public AccountService(AccountRepository accountRepository,UserRepository userRepo,PasswordEncoder passwordEncoder ,JwtService jwtService) {
         this.accountRepository = accountRepository;
         this.userRepo = userRepo;
+        this.passwordEncoder=passwordEncoder;
+        this.jwtService= jwtService;
     }
 
     @Async
@@ -49,9 +59,8 @@ public class AccountService {
         accountRepository.save(account);
     }
     
-    public Account DefaultcreateAccount(int id) {
+    public Account DefaultcreateAccount() {
     	Account account = new Account();
-    	account.setUserId(id);
         account.setAccountNumber(generateUniqueAccountNumber());
             account.setAccountType(AccountType.CURRENT_ACCOUNT);
 
@@ -90,8 +99,7 @@ public class AccountService {
                 userAccount.getAccountBalance(),
                 userAccount.getAccountNumber(),
                 userAccount.getAccountType().name(),
-                userAccount.getAccountStatus().name(),
-                userAccount.getUserId()
+                userAccount.getAccountStatus().name()
         );
     }
  public Account updateAccount(String accountNumber , Account existingAccount) {
@@ -109,7 +117,7 @@ public class AccountService {
     
    
    
-    
+   /* 
     public void creditAccount(String receiverAccountNumber,double amount) throws AccountNotFoundException {
     Account account = 	accountRepository.findAccountByAccountNumber(receiverAccountNumber).get();
     	double oldbalance = account.getAccountBalance() ;
@@ -121,7 +129,7 @@ public class AccountService {
         
     }
     
-   
+   */
     
     
     public String closeAccount(String AccountNumber) throws AccountCannotCloseException {
@@ -151,5 +159,60 @@ public class AccountService {
 		// TODO Auto-generated method stub
 		return accountRepository.findAll();
 	}
+	public List<User> getUserByRole(Role role){
+		return userRepo.findByRole(role);
+	}
+
+	
+	public AuthenticationResponse createManager(RegisterRequest request) throws UserAlreadyExistException {
+		Optional<User>emailExist = userRepo.findByEmail(request.getEmail());
+		 var manager = User.builder()
+		    		
+			        .firstname(request.getFirstname())
+			        .lastname(request.getLastname())
+			        .email(request.getEmail())
+			        .password(passwordEncoder.encode(request.getPassword()))
+			        .role(Role.MANAGER)
+			        .build();
+				  	if(emailExist.isPresent()){
+				  		throw new UserAlreadyExistException("manager with " + emailExist.get().getEmail() + " is already exists ");
+				  		
+				  	}
+				  	else
+				  	{
+					    userRepo.save(manager);
+				  	}
+				  	 var jwtToken = jwtService.generateToken(manager);
+				     return AuthenticationResponse.builder()
+				         .accessToken(jwtToken)
+				         .build();
+		
+	}
+
+	public AuthenticationResponse createEmployee(RegisterRequest request) throws UserAlreadyExistException {
+		// TODO Auto-generated method stub
+		Optional<User>emailExist = userRepo.findByEmail(request.getEmail());
+		 var employee = User.builder()
+		    		
+			        .firstname(request.getFirstname())
+			        .lastname(request.getLastname())
+			        .email(request.getEmail())
+			        .password(passwordEncoder.encode(request.getPassword()))
+			        .role(Role.EMPLOYEE)
+			        .build();
+				  	if(emailExist.isPresent()){
+				  		throw new UserAlreadyExistException("employee with " + emailExist.get().getEmail() + " is already exists ");
+				  		
+				  	}
+				  	else
+				  	{
+					    userRepo.save(employee);
+				  	}
+				  	 var jwtToken = jwtService.generateToken(employee);
+				     return AuthenticationResponse.builder()
+				         .accessToken(jwtToken)
+				         .build();
+	}
+	
 	
 }

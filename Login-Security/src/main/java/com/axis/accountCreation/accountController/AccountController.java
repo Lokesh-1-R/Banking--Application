@@ -18,10 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.axis.accountCreation.Exceptions.AccountCannotCloseException;
 import com.axis.accountCreation.Exceptions.AccountNotFoundException;
+import com.axis.accountCreation.Exceptions.UserAlreadyExistException;
 import com.axis.accountCreation.accountService.AccountOverviewResponse;
 import com.axis.accountCreation.accountService.AccountService;
 import com.axis.accountCreation.model.Account;
+import com.axis.accountCreation.model.AccountStatus;
+import com.axis.auth.AuthenticationResponse;
+import com.axis.auth.RegisterRequest;
 import com.axis.config.JwtService;
+import com.axis.service.UserServiceImplem;
+import com.axis.user.Role;
 import com.axis.user.User;
 import com.axis.userrepository.UserRepository;
 
@@ -33,11 +39,13 @@ public class AccountController {
 
     private final AccountService accountService;
     private final JwtService jwtService;
+    private final UserServiceImplem userServiceImplem;
     
     @Autowired
-    public AccountController(AccountService accountService, JwtService jwtService) {
+    public AccountController(AccountService accountService, JwtService jwtService,UserServiceImplem userServiceImplem) {
         this.accountService = accountService;
         this.jwtService = jwtService;
+        this.userServiceImplem=userServiceImplem;
     }
 
     /**
@@ -108,13 +116,20 @@ public class AccountController {
     	return new ResponseEntity<AccountOverviewResponse>(accountService.generateAccountOverviewByUserId(AccountNumber),HttpStatus.OK);
     }
     
-    @GetMapping("/allUsers")
+    @GetMapping("/allusersdemo")
     public List<User> listAll(){
-    	return accountService.getAllUsers();
+    	return userServiceImplem.getAllUsers();
     }
     
-    @GetMapping("/user/{id}")
+    @GetMapping("/userdemo/{id}")
     public User findbyId(@PathVariable int id) {
-    	return accountService.getUserByID(id);
+    	return userServiceImplem.getUserByID(id);
     }
-}
+    
+    @GetMapping("/userbyrole/{role}")
+    public List<User> getUserByRole(@PathVariable Role role) {
+		return  accountService.getUserByRole(role);
+    	
+
+    }
+  }

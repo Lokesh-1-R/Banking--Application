@@ -1,11 +1,14 @@
 package com.axis.user;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +19,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.axis.accountCreation.model.Account;
 
 
 @SuppressWarnings("unused")
@@ -30,6 +35,10 @@ public class User implements UserDetails {
   @Id
   @GeneratedValue
   private Integer id;
+  
+  @OneToOne(mappedBy = "userId")
+
+  private Account account;
   private String firstname;
   private String lastname;
   private String email;
@@ -37,6 +46,8 @@ public class User implements UserDetails {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+  
+
 
 
   @Override

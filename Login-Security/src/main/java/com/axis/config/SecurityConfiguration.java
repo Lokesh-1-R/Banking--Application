@@ -40,25 +40,36 @@ public class SecurityConfiguration {
         .disable()
         .authorizeHttpRequests()
         .requestMatchers(
-                "/api/v1/auth/**","/api/v1/accounts/**"
+                "/api/v1/auth/**",
+                "/api/v1/accounts/**"
                 
         )
           .permitAll()
+/*
+          .requestMatchers("/api/v1/accounts/all","/api/v1/accounts/{id}","/api/v1/accounts/user/{id}").hasAnyRole(ADMIN.name(), MANAGER.name() , EMPLOYEE.name())
 
 
-        .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
+
+          .requestMatchers(GET, "/api/v1/accounts/all","/api/v1/accounts/{id}","/api/v1/accounts/user/{id}").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name(),EMPLOYEE_READ.name())
+          .requestMatchers(POST, "/api/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGER_CREATE.name(),EMPLOYEE_CREATE.name())
+          .requestMatchers(PUT, "/api/v1/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), MANAGER_UPDATE.name(),EMPLOYEE_DELETE.name())
+          .requestMatchers(DELETE, "/api/v1/management/**").hasAnyAuthority(ADMIN_DELETE.name(), MANAGER_DELETE.name(),EMPLOYEE_DELETE.name())
 
 
-        .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())
-        .requestMatchers(POST, "/api/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGER_CREATE.name())
+
+        .requestMatchers("/api/v1/accounts/allUsers","/api/v1/auth/employeeregister").hasAnyRole(ADMIN.name(), MANAGER.name())
+
+
+        .requestMatchers(GET, "/api/v1/accounts/allUsers").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())
+        .requestMatchers(POST, "/api/v1/auth/employeeregister").hasAnyAuthority(ADMIN_CREATE.name(), MANAGER_CREATE.name())
         .requestMatchers(PUT, "/api/v1/management/**").hasAnyAuthority(ADMIN_UPDATE.name(), MANAGER_UPDATE.name())
         .requestMatchers(DELETE, "/api/v1/management/**").hasAnyAuthority(ADMIN_DELETE.name(), MANAGER_DELETE.name())
 
 
-        .requestMatchers("/api/v1/a/**").hasRole(ADMIN.name())
+        .requestMatchers("/api/v1/accounts/userbyrole/{role}","/api/v1/auth/managerregister").hasRole(ADMIN.name())
 
-        .requestMatchers(GET, "/api/v1/admin/**").hasAuthority(ADMIN_READ.name())
-        .requestMatchers(POST, "/api/v1/admin/**").hasAuthority(ADMIN_CREATE.name())
+        .requestMatchers(GET, "/api/v1/accounts/userbyrole/{role}").hasAuthority(ADMIN_READ.name())
+        .requestMatchers(POST, "/api/v1/auth/managerregister").hasAuthority(ADMIN_CREATE.name())
         .requestMatchers(PUT, "/api/v1/accounts/update/{id}").hasAuthority(ADMIN_UPDATE.name())
         .requestMatchers(DELETE, "/api/v1/admin/**").hasAuthority(ADMIN_DELETE.name())
 
@@ -74,6 +85,7 @@ public class SecurityConfiguration {
         .logout()
         .logoutUrl("/api/v1/auth/logout")
         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+  */
     ;
 
     return http.build();
