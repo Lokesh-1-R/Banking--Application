@@ -34,19 +34,6 @@ public class AuthenticationController {
     return ResponseEntity.ok(service.authenticate(request));
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
 
-  @PostMapping("/managerregister")
-  public ResponseEntity<AuthenticationResponse> managerRegister(
-      @RequestBody RegisterRequest request
-  ) throws UserAlreadyExistException {
-    return ResponseEntity.ok(accountService.createManager(request));
-}
-  @PostMapping("/employeeregister")
-  public ResponseEntity<AuthenticationResponse> employeeRegister(
-      @RequestBody RegisterRequest request
-  ) throws UserAlreadyExistException {
-    return ResponseEntity.ok(accountService.createEmployee(request));
-}
 
 }

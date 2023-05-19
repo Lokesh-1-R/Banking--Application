@@ -1,5 +1,8 @@
 package com.axis.accountCreation.accountController;
 
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import com.axis.accountCreation.accountService.AccountOverviewResponse;
 import com.axis.accountCreation.accountService.AccountService;
 import com.axis.accountCreation.model.Account;
 import com.axis.accountCreation.model.AccountStatus;
+import com.axis.accountCreation.pdfGenerator.PDFGenerator;
 import com.axis.auth.AuthenticationResponse;
 import com.axis.auth.RegisterRequest;
 import com.axis.config.JwtService;
@@ -30,6 +34,10 @@ import com.axis.service.UserServiceImplem;
 import com.axis.user.Role;
 import com.axis.user.User;
 import com.axis.userrepository.UserRepository;
+import com.lowagie.text.DocumentException;
+
+import io.jsonwebtoken.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -125,11 +133,24 @@ public class AccountController {
     public User findbyId(@PathVariable int id) {
     	return userServiceImplem.getUserByID(id);
     }
-    
-    @GetMapping("/userbyrole/{role}")
-    public List<User> getUserByRole(@PathVariable Role role) {
-		return  accountService.getUserByRole(role);
-    	
 
-    }
+    @GetMapping("/pdf/accounts")
+	public void generatePdf(HttpServletResponse response) throws DocumentException, IOException, java.io.IOException {
+		
+		response.setContentType("application/pdf");
+		DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD:HH:MM:SS");
+		String currentDateTime = dateFormat.format(new Date(00, 00, 00));
+		String headerkey = "Content-Disposition";
+		String headervalue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+		response.setHeader(headerkey, headervalue);
+		
+		List<Account> accountList = accountService.getAllAccounts();
+		
+		PDFGenerator generator = new PDFGenerator();
+		 generator.setAccountList(accountList);
+		generator.generate(response);
+		
+	}
+
+    
   }

@@ -25,7 +25,7 @@ public class Account {
             strategy = GenerationType.SEQUENCE,
             generator = "account_id_sequence"
     )
-    private Integer Id;
+    private int Id;
     
     
     private double accountBalance;
